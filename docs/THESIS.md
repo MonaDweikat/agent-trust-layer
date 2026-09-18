@@ -18,11 +18,11 @@ until when," not "trusted, how much."
 
 Authority delegation chains become the norm. A human grants a scoped
 credential to their agent, which sub-delegates a narrower slice to a
-tool-calling helper for one job, each link independently verifiable and
+helper, which sub-delegates again, each link independently verifiable and
 revocable, and each delegator constrained to hand out no more than it
-actually holds. This project's one-hop chain is the minimal version of a
-pattern (closer to UCAN/ZCAP-LD capability delegation than to flat VCs) that
-has to generalize to arbitrary depth once agents routinely spawn agents.
+actually holds — this project's recursive, arbitrary-depth chain (closer to
+UCAN/ZCAP-LD capability delegation than to flat VCs) is a minimal instance
+of what has to hold once agents routinely spawn agents that spawn agents.
 
 The open question deciding who wins this layer: whether verification
 infrastructure — issuers, status registries, policy languages — stays

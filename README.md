@@ -49,13 +49,33 @@ npm run web:dev
 - Holder binding: a genuine credential about someone else doesn't count toward you, even with valid signatures throughout
 - A delegation chain of **arbitrary depth**, walked recursively, where a delegator can never hand out more authority than they can prove they hold — checked at every hop, not assumed at the root
 
-## AI tools used
+## Notes
+
+### AI tools used
 Built with Claude Code (Anthropic). Used for scaffolding, implementation of
 all modules, and drafting the attack scenarios and docs. All cryptographic
 logic (signing/verification/did:key encoding) was written and independently
 smoke-tested against expected pass/fail cases rather than assumed correct.
 
-## Out of scope
+### Key decisions
+- **`did:key` over a hosted DID method** — self-certifying, resolvable
+  offline, no registry dependency, while still a real W3C standard.
+- **VC-JWT over JSON-LD/LD-Proofs** — real asymmetric signing/verification
+  without JSON-LD canonicalization complexity.
+- **No trust score, anywhere** — policy evaluation always produces a rule
+  trace over verified claims, never a scalar. See the Sybil vouch-ring
+  attack for why a score specifically fails here.
+- **Holder binding by default** — a credential's signature being genuine
+  doesn't mean it belongs to whoever is presenting it; policy rules check
+  `credential.subject === presenter` separately. See the stolen-credential
+  attack.
+- **Delegation as a recursively-verified credential chain**, not a flat
+  grant — a delegator can never hand out more authority than they can prove
+  they hold, checked at every hop back to a trusted root.
+
+Full reasoning for each: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
+
+### Out of scope
 See "Deliberately out of scope" in [PLAN.md](./PLAN.md) for the full
 reasoning. In short: no hosted DID resolution (did:key stays offline and
 dependency-free on purpose), no persistent revocation store (the in-memory
