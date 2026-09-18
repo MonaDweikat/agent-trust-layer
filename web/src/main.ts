@@ -1,84 +1,78 @@
-import { SCENARIOS, type ScenarioResult, type Step } from "./scenarios.js";
-import type { TaskEvaluation } from "../../src/agents/index.js";
+import { SCENARIOS, type Step } from "./scenarios.js";
 
 const nav = document.getElementById("scenario-nav")!;
 const output = document.getElementById("output")!;
 
-function renderEvaluation(requester: string, evaluation: TaskEvaluation, note?: string): HTMLElement {
-  const card = document.createElement("div");
-  card.className = `decision-card ${evaluation.decision}`;
-
-  const heading = document.createElement("p");
-  heading.className = "decision-heading";
-  heading.textContent =
-    evaluation.decision === "accept"
-      ? `✅ ACCEPT — task request from ${requester}`
-      : `❌ REFUSE — task request from ${requester}`;
-  card.appendChild(heading);
-
-  if (!evaluation.holderValid) {
-    const reason = document.createElement("p");
-    reason.className = "decision-note";
-    reason.textContent = evaluation.holderReason ?? "presentation signature invalid";
-    card.appendChild(reason);
-  }
-
-  if (note) {
-    const noteEl = document.createElement("p");
-    noteEl.className = "decision-note";
-    noteEl.textContent = note;
-    card.appendChild(noteEl);
-  }
-
-  const list = document.createElement("ul");
-  list.className = "rule-list";
-  for (const rule of evaluation.trace) {
-    const li = document.createElement("li");
-    li.className = rule.passed ? "pass" : "fail";
-    const mark = document.createElement("span");
-    mark.className = "rule-mark";
-    mark.textContent = rule.passed ? "✓" : "✗";
-    const text = document.createElement("span");
-    text.textContent = rule.description;
-    li.appendChild(mark);
-    li.appendChild(text);
-    list.appendChild(li);
-  }
-  card.appendChild(list);
-
-  return card;
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function renderStep(step: Step): HTMLElement {
-  if (step.kind === "text") {
-    const p = document.createElement("p");
-    p.className = "step-text";
-    p.textContent = step.text;
-    return p;
+  const row = document.createElement("div");
+  row.className = `step step-${step.kind}`;
+
+  if (step.kind === "narrate") {
+    row.innerHTML = `<p class="narrate-text">${step.text}</p>`;
+    return row;
   }
-  return renderEvaluation(step.requester, step.evaluation, step.note);
+
+  if (step.kind === "issue") {
+    row.innerHTML = `
+      <span class="actor actor-issuer">${step.from}</span>
+      <span class="arrow">issues ⟶</span>
+      <span class="actor actor-recipient">${step.to}</span>
+      <span class="payload">${step.label}</span>
+    `;
+    return row;
+  }
+
+  if (step.kind === "message") {
+    row.innerHTML = `
+      <span class="actor actor-sender">${step.from}</span>
+      <span class="arrow arrow-message">──────▶</span>
+      <span class="actor actor-recipient">${step.to}</span>
+      <span class="payload">${step.label}</span>
+    `;
+    return row;
+  }
+
+  if (step.kind === "check") {
+    row.classList.add(step.passed ? "check-pass" : "check-fail");
+    const mark = step.passed ? "✓" : "✗";
+    row.innerHTML = `
+      <span class="check-mark">${mark}</span>
+      <span class="check-actor">${step.actor} checks:</span>
+      <span class="check-label">${step.label}</span>
+      ${step.detail ? `<span class="check-detail">${step.detail}</span>` : ""}
+    `;
+    return row;
+  }
+
+  // decision
+  const heading = step.accepted
+    ? `✅ ACCEPT — ${step.requester}'s request is granted`
+    : `❌ REFUSE — ${step.requester}'s request is denied`;
+  row.classList.add(step.accepted ? "decision-accept" : "decision-refuse");
+  row.innerHTML = `<p class="decision-heading">${heading}</p>`;
+  return row;
 }
 
-function renderResult(result: ScenarioResult): void {
+async function playScenario(steps: Step[]): Promise<void> {
   output.innerHTML = "";
-
-  const title = document.createElement("h2");
-  title.className = "scenario-title";
-  title.textContent = result.title;
-  output.appendChild(title);
-
-  const summary = document.createElement("p");
-  summary.className = "scenario-summary";
-  summary.textContent = result.summary;
-  output.appendChild(summary);
-
-  for (const step of result.steps) {
-    output.appendChild(renderStep(step));
+  for (const step of steps) {
+    const el = renderStep(step);
+    el.classList.add("enter");
+    output.appendChild(el);
+    output.scrollTop = output.scrollHeight;
+    // Force layout so the enter transition actually plays, then trigger it.
+    requestAnimationFrame(() => el.classList.add("enter-active"));
+    const delay = step.kind === "decision" ? 250 : step.kind === "narrate" ? 500 : 350;
+    await sleep(delay);
   }
 }
 
 function setLoading(): void {
-  output.innerHTML = '<p class="loading">Generating keys, signing credentials, verifying…</p>';
+  output.innerHTML = '<p class="loading">Generating keys, signing credentials, computing…</p>';
 }
 
 for (const scenario of SCENARIOS) {
@@ -94,7 +88,13 @@ for (const scenario of SCENARIOS) {
 
     try {
       const result = await scenario.run();
-      renderResult(result);
+      await sleep(150);
+      const header = document.createElement("div");
+      header.className = "scenario-header";
+      header.innerHTML = `<h2 class="scenario-title">${result.title}</h2><p class="scenario-summary">${result.summary}</p>`;
+      output.innerHTML = "";
+      output.appendChild(header);
+      await playScenario(result.steps);
     } catch (err) {
       output.innerHTML = `<p class="loading">Error running scenario: ${(err as Error).message}</p>`;
     } finally {
