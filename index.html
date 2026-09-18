@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent Trust Layer — live demo</title>
+    <meta
+      name="description"
+      content="Real did:key identity, VC-JWT credentials, revocation, and a policy engine that gates whether an AI agent accepts or refuses a task — run live in your browser."
+    />
+    <script type="module" crossorigin src="/agent-trust-layer/assets/index-Cis7YzaF.js"></script>
+    <link rel="stylesheet" crossorigin href="/agent-trust-layer/assets/index-CUDzl0Bc.css">
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <h1>Agent Trust Layer</h1>
+        <p class="tagline">
+          Real Ed25519 signing, real <code>did:key</code> identities, real EdDSA-signed Verifiable
+          Credentials — every decision below is computed live in your browser, not scripted.
+        </p>
+        <p class="repo-link">
+          <a href="https://github.com/MonaDweikat/agent-trust-layer" target="_blank" rel="noopener">Source on GitHub →</a>
+        </p>
+      </header>
+
+      <main class="layout">
+        <nav id="scenario-nav" class="scenario-nav" aria-label="Scenarios"></nav>
+        <section id="output" class="output" aria-live="polite">
+          <p class="placeholder">Pick a scenario on the left. Each one issues real signed credentials and runs a live trust-gated decision.</p>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
