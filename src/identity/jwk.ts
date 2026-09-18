@@ -6,8 +6,11 @@
 
 import type { AgentIdentity } from "./index.js";
 
+/** Cross-platform (Node + browser) base64url encoding — no Buffer dependency. */
 function base64url(bytes: Uint8Array): string {
-  return Buffer.from(bytes).toString("base64url");
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
 /** Private JWK (includes `d`) — used only by the identity that owns the key, to sign. */

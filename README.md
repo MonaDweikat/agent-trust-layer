@@ -8,6 +8,10 @@ delegation and a set of concrete attacks the trust layer is built to catch.
 Status: fully implemented and working end to end (identity, credentials,
 revocation, verification, policy, delegation, agents, 8 demo scenarios).
 
+**Live demo:** https://monadweikat.github.io/agent-trust-layer/ — runs the
+identical logic client-side in your browser (real key generation, real
+signing, real verification), no backend involved.
+
 ## Setup
 ```
 npm install
@@ -27,10 +31,15 @@ npm run demo:stolen      # Mallory replays a copy of Agent A's real credential �
 npm run demo:sybil       # Mallory's 3 puppet-agent vouches don't count — untrusted vouchers
 ```
 
+To run the browser demo locally instead of the hosted version:
+```
+npm run web:dev
+```
+
 ## Docs
-- [PLAN.md](./PLAN.md) — build order, hardening log, and out-of-scope decisions (with reasoning)
+- [PLAN.md](./PLAN.md) — build order, design fixes, and out-of-scope decisions (with reasoning)
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — identity → claims → verification → policy, and the key design decisions
-- [docs/FAILURE-TEST.md](./docs/FAILURE-TEST.md) — 5 attack scenarios and what specifically catches each
+- [docs/FAILURE-TEST.md](./docs/FAILURE-TEST.md) — 6 attack scenarios and what specifically catches each
 - [docs/THESIS.md](./docs/THESIS.md) — two-year thesis on agent identity/reputation (300 words)
 
 ## What's real here (not vibes)
@@ -49,9 +58,9 @@ smoke-tested against expected pass/fail cases rather than assumed correct.
 ## Out of scope
 See "Deliberately out of scope" in [PLAN.md](./PLAN.md) for the full
 reasoning. In short: no hosted DID resolution (did:key stays offline and
-dependency-free on purpose), no persistent revocation store (the demo's
-ephemeral per-run identities would make it inert scaffolding, not a
-demonstrated capability), and no weighted/multi-party trust graphs (a
-weighted score is exactly the anti-pattern this project argues against —
-see the Sybil vouch-ring scenario). Multi-hop delegation, originally listed
-as out of scope, was reconsidered and implemented for real.
+dependency-free on purpose), no persistent revocation store (the in-memory
+signed-list mechanism is already real; only its storage medium would
+change), and no weighted/multi-party trust graphs (a weighted score is
+exactly the anti-pattern this project argues against — see the Sybil
+vouch-ring scenario). Multi-hop delegation chains, by contrast, are fully
+implemented — see `demo:multi-hop`.

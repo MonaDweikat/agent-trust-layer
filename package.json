@@ -15,7 +15,11 @@
     "demo:stolen": "tsx demo/scenario-stolen-credential.ts",
     "demo:sybil": "tsx demo/scenario-sybil-vouches.ts",
     "demo:all": "npm run demo:happy && npm run demo:forged && npm run demo:revoked && npm run demo:no-creds && npm run demo:delegation && npm run demo:multi-hop && npm run demo:stolen && npm run demo:sybil",
-    "test": "tsx test/identity.test.ts && tsx test/credentials.test.ts && tsx test/revocation.test.ts && tsx test/verification.test.ts && tsx test/policy.test.ts"
+    "test": "tsx test/identity.test.ts && tsx test/credentials.test.ts && tsx test/revocation.test.ts && tsx test/verification.test.ts && tsx test/policy.test.ts",
+    "web:dev": "vite",
+    "web:build": "vite build",
+    "web:preview": "vite preview",
+    "web:deploy": "npm run web:build && gh-pages -d web-dist"
   },
   "dependencies": {
     "@noble/curves": "^1.6.0",
@@ -23,7 +27,9 @@
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
+    "gh-pages": "^6.3.0",
     "tsx": "^4.19.1",
-    "typescript": "^5.6.3"
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21"
   }
 }
