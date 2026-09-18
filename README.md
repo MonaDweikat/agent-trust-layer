@@ -51,6 +51,27 @@ npm run web:dev
 
 ## Notes
 
+### What to look at
+If you only have a few minutes, in order:
+
+1. **Live demo → "6. Multi-hop delegation"** at https://monadweikat.github.io/agent-trust-layer/
+   — watch the timeline: two real delegation hops, then a forged-chain attack
+   caught mid-verification. This single scenario shows identity, credentials,
+   verification, and policy all in one interaction.
+2. **`demo/policies.ts`** (`isValidAuthorityCredential`) — the recursive
+   chain-of-custody walk: a delegator can never hand out more authority than
+   they can prove they hold, checked at every hop back to a trusted issuer.
+   This is the technical centerpiece.
+3. **`src/policy/index.ts`** — the whole rule engine, and why `evaluate()`
+   returns a trace instead of a score. Read alongside the Sybil vouch-ring
+   attack (`demo:sybil`) to see why that distinction isn't cosmetic.
+4. **`docs/FAILURE-TEST.md`** — 6 attacks, each defeated by a different
+   layer (signing, lifecycle, holder identity, chain-of-custody, social
+   graph). Worth reading even without running the code.
+5. **`src/verification/index.ts`** — every rejection returns a specific,
+   human-readable reason rather than a boolean; this is what makes each
+   demo decision explainable, not just correct.
+
 ### AI tools used
 Built with Claude Code (Anthropic). Used for scaffolding, implementation of
 all modules, and drafting the attack scenarios and docs. All cryptographic
